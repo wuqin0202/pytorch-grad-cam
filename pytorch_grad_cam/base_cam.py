@@ -101,7 +101,7 @@ class BaseCAM:
         self.outputs = outputs = self.activations_and_grads(input_tensor)
 
         if targets is None:
-            target_categories = np.argmax(outputs.cpu().data.numpy(), axis=-1)
+            target_categories = np.argmax(outputs.float().cpu().data.numpy(), axis=-1)
             targets = [ClassifierOutputTarget(category) for category in target_categories]
 
         if self.uses_gradients:
@@ -143,8 +143,8 @@ class BaseCAM:
         self, input_tensor: torch.Tensor, targets: List[torch.nn.Module], eigen_smooth: bool
     ) -> np.ndarray:
         if self.detach:
-            activations_list = [a.cpu().data.numpy() for a in self.activations_and_grads.activations]
-            grads_list = [g.cpu().data.numpy() for g in self.activations_and_grads.gradients]
+            activations_list = [a.float().cpu().data.numpy() for a in self.activations_and_grads.activations]
+            grads_list = [g.float().cpu().data.numpy() for g in self.activations_and_grads.gradients]
         else:
             activations_list = [a for a in self.activations_and_grads.activations]
             grads_list = [g for g in self.activations_and_grads.gradients]
