@@ -80,8 +80,8 @@ def reshape_transform(tensor, height=16, width=16):
 class ImageClassifier(nn.Module):
     def __init__(self, labels):
         super(ImageClassifier, self).__init__()
-        self.clip = CLIPModel.from_pretrained("openai/clip-vit-large-patch14")
-        self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
+        self.clip = CLIPModel.from_pretrained("/data25/wuqin/.cache/huggingface/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41")
+        self.processor = CLIPProcessor.from_pretrained("/data25/wuqin/.cache/huggingface/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41")
         self.labels = labels
 
     def forward(self, x):
@@ -148,8 +148,8 @@ if __name__ == '__main__':
 
     # If None, returns the map for the highest scoring category.
     # Otherwise, targets the requested category.
-    #targets = [ClassifierOutputTarget(1)]
-    targets = None
+    targets = [ClassifierOutputTarget(0)]
+    # targets = None
 
     # AblationCAM and ScoreCAM have batched implementations.
     # You can override the internal batch size for faster computation.

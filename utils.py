@@ -1,5 +1,61 @@
 from PIL import Image
 import matplotlib.pyplot as plt
+import numpy as np
+import cv2
+
+
+def overlay_similarity_heatmap(sim_norm: np.ndarray,
+                               rgb: np.ndarray,
+                               alpha_img: float = 0.4,
+                               alpha_map: float = 0.6,
+                               colormap: int = cv2.COLORMAP_JET) -> np.ndarray:
+    """
+    参数:
+        sim_norm: (H, W) 的相似度归一化图, 建议已在 [0, 1]，若越界会被裁剪
+        rgb: (H, W, 3) 的 RGB 图 (np.uint8 或 float)
+        alpha_img: 原图权重
+        alpha_map: 热图权重
+        colormap: OpenCV 伪彩色映射（默认 JET）
+    返回:
+        叠加后的 RGB 图 (uint8)
+    """
+    assert sim_norm.ndim == 2, "sim_norm 必须是二维(H, W)"
+    assert rgb.ndim == 3 and rgb.shape[2] == 3, "rgb 必须是(H, W, 3)"
+
+    H, W = rgb.shape[:2]
+
+    # 处理 NaN/Inf 并裁剪到 [0,1]
+    sim = np.nan_to_num(sim_norm, nan=0.0, posinf=1.0, neginf=0.0)
+    sim = np.clip(sim, 0.0, 1.0)
+
+    # 尺寸对齐（双线性插值）
+    if sim.shape != (H, W):
+        sim_resized = cv2.resize(sim, (W, H), interpolation=cv2.INTER_LINEAR)
+    else:
+        sim_resized = sim
+
+    # 转为 0-255 的 uint8 单通道
+    sim_u8 = (sim_resized * 255.0).astype(np.uint8)
+
+    # 生成 BGR 伪彩色热图
+    heatmap_bgr = cv2.applyColorMap(sim_u8, colormap)
+
+    # 规范化 rgb 到 uint8，并从 RGB->BGR
+    if np.issubdtype(rgb.dtype, np.floating):
+        # 自动判断浮点范围：若最大值<=1，则按[0,1]处理，否则假定已是[0,255]
+        scale = 255.0 if rgb.max() <= 1.0 else 1.0
+        rgb_u8 = np.clip(rgb * scale, 0, 255).astype(np.uint8)
+    else:
+        rgb_u8 = rgb.astype(np.uint8)
+
+    bgr = cv2.cvtColor(rgb_u8, cv2.COLOR_RGB2BGR)
+
+    # 融合（等价于 cv2_img * 0.4 + vis * 0.6）
+    blended_bgr = cv2.addWeighted(bgr, alpha_img, heatmap_bgr, alpha_map, 0.0)
+
+    # 转回 RGB 输出
+    blended_rgb = cv2.cvtColor(blended_bgr, cv2.COLOR_BGR2RGB)
+    return blended_rgb
 
 
 def show_tensor_image(image_tensor):
