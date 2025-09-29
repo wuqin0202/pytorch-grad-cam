@@ -13,12 +13,9 @@ from omnixai.explainers.vision_language.specific.gradcam import GradCAM
 from lavis.models import BlipITM
 from lavis.processors import load_processor
 from lavis.models import load_model
-from lavis.models import load_model_and_preprocess
 
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-
-from omnixai.explainers.vision_language.specific.gradcam.pytorch.gradcam import Base
 
 device = "cuda"
 

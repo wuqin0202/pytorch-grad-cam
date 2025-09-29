@@ -7,9 +7,6 @@ dist
 ckpt/*
 testset
 
-src
-clip
-vlmaps
 output
 examples
 .vscode

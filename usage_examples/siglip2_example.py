@@ -12,7 +12,7 @@ from pytorch_grad_cam import (
     GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM,
     XGradCAM, EigenCAM, EigenGradCAM, LayerCAM, FullGrad
 )
-from pytorch_grad_cam.utils.image import show_cam_on_image, preprocess_image
+from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.ablation_layer import AblationLayerVit
 
 

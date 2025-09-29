@@ -30,7 +30,6 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.ablation_layer import AblationLayerVit
 
 from vggt_utils import load_and_preprocess_images
-from utils import tensor2pil
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -47,6 +46,7 @@ def get_args():
         default="英文字母的颜色",
         help='Text query'
     )
+    parser.add_argument('--output-dir', type=str, default='./output/qwen2_5vl_encoder', help='Output directory')
     parser.add_argument('--aug_smooth', action='store_true',
                         help='Apply test time augmentation to smooth the CAM')
     parser.add_argument(
@@ -105,6 +105,7 @@ class ImageClassifier(nn.Module):
                 torch_dtype="auto",
                 device_map="cuda"
             )
+            print(self.model)
             self.processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
         else:
             # 使用本地模型
@@ -574,8 +575,8 @@ if __name__ == '__main__':
     model = ImageClassifier()
 
     # 仅限 visual 相关层，该层输出必须为 Tensor 类型
-    # target_layers = [model.model.model.visual.blocks[-1]] # merge 前
-    target_layers = [model.model.model.visual.merger] # merge 后
+    target_layers = [model.model.model.visual.blocks[-1].norm1] # token merge 前
+    # target_layers = [model.model.model.visual.merger] # token merge 后
 
     if args.method not in methods:
         raise Exception(f"Method {args.method} not implemented")
@@ -621,6 +622,7 @@ if __name__ == '__main__':
     cam_image = show_cam_on_image(img_tensor[0].permute(1, 2, 0).cpu().numpy(), grayscale_cam)
 
     # Save result
-    output_path = f'qwen2_5vl_{args.method}_cam.jpg'
+    os.makedirs(args.output_dir, exist_ok=True)
+    output_path = os.path.join(args.output_dir, f'{os.path.basename(args.image_path)}_{args.method}.jpg')
     cv2.imwrite(output_path, cam_image)
     print(f"CAM visualization saved to {output_path}")

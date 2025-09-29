@@ -1,10 +1,9 @@
 import argparse, os, cv2, numpy as np, torch
 from PIL import Image
 from pytorch_grad_cam import GradCAM, GradCAMPlusPlus, ScoreCAM, AblationCAM, XGradCAM, EigenCAM, EigenGradCAM, LayerCAM, FullGrad
-from pytorch_grad_cam.utils.image import show_cam_on_image, preprocess_image
-from pytorch_grad_cam.ablation_layer import AblationLayerVit
+from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-from src.mini_clip.factory import create_model_and_transforms, get_tokenizer   # 官方实现
+from metaclip.mini_clip.factory import create_model_and_transforms, get_tokenizer   # 官方实现
 os.environ['HOME'] = '/data25/wuqin'
 
 import ssl
